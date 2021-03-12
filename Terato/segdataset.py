@@ -99,16 +99,14 @@ class SegmentationDataset(VisionDataset):
     '''
     Given an index returns a dictionary in the form:
         {
-            "image": original image array
-            "outline_mask": mask image array
-            ...
-            ...
-            "heart_mask": mask image array
+            "image": original image tensor
+            "masks": multidimensional tensor containing all the masks
         }
     '''
     def __getitem__(self, index: int) -> Any:
         image_path = self.image_names[index]
 
+        # Let's read the image
         with open(image_path, "rb") as image_file:
             '''
             Read the image and save it in the dictionary
@@ -118,30 +116,31 @@ class SegmentationDataset(VisionDataset):
                 image = image.convert("RGB")
             elif self.image_color_mode == "grayscale":
                 image = image.convert("L")
-            sample = {'image' : image}
-            if self.transforms:
-                sample['image'] = self.transforms(sample['image'])
-            '''
-            Iterate over all the masks, read them and save them in the
-            '''
-            THRESHOLD_VALUE = 255
-            #Load image and convert to greyscale
-            imgData = np.asarray(image.convert("L"))
-            black_mask = (imgData > THRESHOLD_VALUE) * 1.0
-            sample['mask'] = []
+        
+        sample = {'image' : self.transforms(image)}
+        sample['masks'] = []
+        
+        
+        # Let's create a black image for the masks that don't correspond to the image
+        THRESHOLD_VALUE = 255
+        #Load image and convert to greyscale
+        imgData = np.asarray(image.convert("L"))
+        black_mask = (imgData > THRESHOLD_VALUE) * 1.0
+        
 
-            for mask_path in self.mask_folder_paths:
-                try:
-                    with open(mask_path / image_path.parts[-1],"rb") as mask_file:
-                        mask = Image.open(mask_file)
-                        if self.mask_color_mode == "rgb":
-                            mask = mask.convert("RGB")
-                        elif self.mask_color_mode == "grayscale":
-                            mask = mask.convert("L")
-                        sample['mask'].append(self.transforms(mask))
+        # Iterate over all the masks, read them and save them in the dictionary
+        for mask_path in self.mask_folder_paths:
+            try:
+                with open(mask_path / image_path.parts[-1],"rb") as mask_file:
+                    mask = Image.open(mask_file)
+                    if self.mask_color_mode == "rgb":
+                        mask = mask.convert("RGB")
+                    elif self.mask_color_mode == "grayscale":
+                        mask = mask.convert("L")
+                    sample['masks'].append(self.transforms(mask))
 
-                except:
-                    sample['mask'].append(self.transforms(black_mask))
-            sample['mask'] = torch.cat(sample['mask'], 0)
-
-            return sample
+            except:
+                sample['masks'].append(self.transforms(black_mask))
+            
+        sample['masks'] = torch.cat(sample['masks'], 0) # Concatenate the masks in one unique tensor
+        return sample

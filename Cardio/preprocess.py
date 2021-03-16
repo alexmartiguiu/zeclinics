@@ -81,9 +81,6 @@ def lifpreprocess(path,out_dir='output',index_of_interest=2,out_shape=256,store=
         current_img=lif_imgs_frames[i]
         os.mkdir(out_dir+path_files[i].split(".")[0])
         for j in range(len(current_img)):
-            if j==0:
-                plt.imshow(current_img[j])
-                plt.show()
             save(out_dir+path_files[i].split(".")[0]+"/"+path_files[i].split(".")[0]+"_"+str(j),current_img[j])
 
     print("Elapsed time = ", time.time()-start)

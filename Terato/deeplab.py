@@ -9,6 +9,22 @@ import datahandler
 from model import createDeepLabv3
 from trainer import train_model
 
+'''
+# WARNING:
+Check https://pytorch.org/get-started/previous-versions/ and install the proper
+pytorch and torchvision versions according to your cuda version.
+
+You can figure out your cuda versions with:
+/usr/local/cuda/bin/nvcc --version
+
+NOTES:
+-Batch size needs to be larger than one due to the batch normalization.
+
+-The chosen loss funcion (nn.BCEWithLogitsLoss()) applies a sigmoid to the
+output ans then applies the binary cross entropy loss function (a pixel belongs
+to a class or doesn't)
+'''
+
 
 '''
 
@@ -38,7 +54,7 @@ images_path = 'Image'
 masks_paths = ['Eyes_dorsal', 'Outline_lateral', 'Yolk_lateral', 'Heart_lateral', 'Outline_dorsal', 'Ov_lateral']
 
 # Path from current path to save the generated model
-exp_directory = './Model_little'
+exp_directory = './Model_resnet50_BCELoss'
 exp_directory = Path(exp_directory)
 if not exp_directory.exists():
     exp_directory.mkdir()
@@ -51,7 +67,7 @@ if not exp_directory.exists():
 
 model = createDeepLabv3()  # Model creation
 print(model)
-criterion = torch.nn.NLLLoss(reduction='mean') # Specify the loss function
+criterion = torch.nn.BCEWithLogitsLoss(reduction='mean') # Specify the loss function
 optimizer = torch.optim.Adam(model.parameters(), lr=1e-4) # Specify the optimizer
                                                           # with a low learning rate
 
@@ -63,7 +79,8 @@ metrics = {'f1_score': sklearn.metrics.f1_score,
 dataloaders = datahandler.get_dataloader_single_folder(data_path,
                                                        images_path,
                                                        masks_paths,
-                                                       batch_size=8)
+                                                       batch_size=2,
+                                                       num_workers = 2)
 
 # Train the model
 _ = train_model(model,

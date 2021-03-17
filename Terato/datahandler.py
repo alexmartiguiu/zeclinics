@@ -12,7 +12,8 @@ def get_dataloader_single_folder(data_dir: str,
                                  image_folder: str,
                                  mask_folders: list,
                                  fraction: float = 0.2,
-                                 batch_size: int = 4):
+                                 batch_size: int = 4,
+                                 num_workers: int = 8):
     """Create train and test dataloader from a single directory containing
     the image and mask folders.
     Args:
@@ -41,7 +42,7 @@ def get_dataloader_single_folder(data_dir: str,
         x: DataLoader(image_datasets[x],
                       batch_size=batch_size,
                       shuffle=True,
-                      num_workers=8)
+                      num_workers=num_workers)
         for x in ['Train', 'Test']
     }
     return dataloaders

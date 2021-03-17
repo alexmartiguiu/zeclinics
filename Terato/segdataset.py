@@ -141,6 +141,6 @@ class SegmentationDataset(VisionDataset):
 
             except:
                 sample['masks'].append(self.transforms(black_mask))
-
-        sample['masks'] = torch.cat(sample['masks'], 0).float() # Concatenate the masks in one unique tensor
+        sample['image'] = sample['image'].long()
+        sample['masks'] = torch.cat(sample['masks'], 0).long() # Concatenate the masks in one unique tensor
         return sample

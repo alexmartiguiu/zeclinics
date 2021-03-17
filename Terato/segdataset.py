@@ -116,17 +116,17 @@ class SegmentationDataset(VisionDataset):
                 image = image.convert("RGB")
             elif self.image_color_mode == "grayscale":
                 image = image.convert("L")
-        
-        sample = {'image' : self.transforms(image).float()}
+
+        sample = {'image' : self.transforms(image)}
         sample['masks'] = []
-        
-        
+
+
         # Let's create a black image for the masks that don't correspond to the image
         THRESHOLD_VALUE = 255
         #Load image and convert to greyscale
         imgData = np.asarray(image.convert("L"))
         black_mask = (imgData > THRESHOLD_VALUE) * 1.0
-        
+
 
         # Iterate over all the masks, read them and save them in the dictionary
         for mask_path in self.mask_folder_paths:
@@ -141,6 +141,6 @@ class SegmentationDataset(VisionDataset):
 
             except:
                 sample['masks'].append(self.transforms(black_mask))
-            
-        sample['masks'] = torch.cat(sample['masks'], 0).float() # Concatenate the masks in one unique tensor
+
+        sample['masks'] = torch.cat(sample['masks'], 0) # Concatenate the masks in one unique tensor
         return sample

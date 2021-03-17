@@ -50,7 +50,7 @@ def train_model(model, criterion, dataloaders, optimizer, metrics, bpath,
                 with torch.set_grad_enabled(phase == 'Train'):
                     outputs = model(inputs)
                     print(outputs['out'].dtype,masks.dtype)
-                    loss = criterion(outputs['out'], masks)
+                    loss = criterion(outputs['out'].long(), masks.long())
                     y_pred = outputs['out'].data.cpu().numpy().ravel()
                     y_true = masks.data.cpu().numpy().ravel()
                     for name, metric in metrics.items():

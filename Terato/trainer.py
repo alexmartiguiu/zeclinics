@@ -16,7 +16,7 @@ def train_model(model, criterion, dataloaders, optimizer, metrics, bpath,
     # Use gpu if available
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     model.to(device)
-    
+
     # Initialize the log file for training and testing loss and metrics
     fieldnames = ['epoch', 'Train_loss', 'Test_loss'] + \
         [f'Train_{m}' for m in metrics.keys()] + \
@@ -49,7 +49,7 @@ def train_model(model, criterion, dataloaders, optimizer, metrics, bpath,
                 # track history if only in train
                 with torch.set_grad_enabled(phase == 'Train'):
                     outputs = model(inputs.float())
-                    loss = criterion(outputs['out'].float(), masks.float())
+                    loss = criterion(outputs['out'], masks)
                     y_pred = outputs['out'].data.cpu().numpy().ravel()
                     y_true = masks.data.cpu().numpy().ravel()
                     for name, metric in metrics.items():

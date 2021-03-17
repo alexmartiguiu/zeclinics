@@ -14,7 +14,7 @@ from trainer import train_model
 
 This first part of the code is responsible to define where data is found and
 where the model is going to be saved. In order to do that a main data directory
-must be declared. Inside the this directory an image folder must exists with 
+must be declared. Inside the this directory an image folder must exists with
 all the raw images and the folders with the different masks containg the masks
 with the exact same name of their corresponding original image:
 
@@ -48,22 +48,22 @@ if not exp_directory.exists():
 ################################### Model creation ###################################
 
 
-    
+
 model = createDeepLabv3()  # Model creation
 print(model)
 criterion = torch.nn.NLLLoss(reduction='mean') # Specify the loss function
-optimizer = torch.optim.Adam(model.parameters(), lr=1e-4) # Specify the optimizer 
+optimizer = torch.optim.Adam(model.parameters(), lr=1e-4) # Specify the optimizer
                                                           # with a low learning rate
 
 # Specify the evaluation metrics
-metrics = {'f1_score': sklearn.metrics.f1_score, 
+metrics = {'f1_score': sklearn.metrics.f1_score,
            'auroc': sklearn.metrics.roc_auc_score}
            #'accuracy_score': sklearn.metrics.accuracy_score}
 # Ceation of the data loaders ['Train', 'Test']
 dataloaders = datahandler.get_dataloader_single_folder(data_path,
                                                        images_path,
-                                                       masks_paths, 
-                                                       batch_size=1)
+                                                       masks_paths,
+                                                       batch_size=8)
 
 # Train the model
 _ = train_model(model,

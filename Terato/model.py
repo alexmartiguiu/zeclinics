@@ -9,7 +9,7 @@ def createDeepLabv3(outputchannels=6):
     Returns:
         model: Returns the DeepLabv3 model with the ResNet101 backbone.
     """
-    model = models.segmentation.deeplabv3_mobilenet_v3_large(pretrained=True,
+    model = models.segmentation.deeplabv3_resnet50(pretrained=True,
                                                                  progress=True)
     model.classifier = DeepLabHead(2048, outputchannels)
     return model

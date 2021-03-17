@@ -117,7 +117,7 @@ class SegmentationDataset(VisionDataset):
             elif self.image_color_mode == "grayscale":
                 image = image.convert("L")
         
-        sample = {'image' : self.transforms(image)}
+        sample = {'image' : self.transforms(image).float()}
         sample['masks'] = []
         
         
@@ -142,5 +142,5 @@ class SegmentationDataset(VisionDataset):
             except:
                 sample['masks'].append(self.transforms(black_mask))
             
-        sample['masks'] = torch.cat(sample['masks'], 0) # Concatenate the masks in one unique tensor
+        sample['masks'] = torch.cat(sample['masks'], 0).float() # Concatenate the masks in one unique tensor
         return sample

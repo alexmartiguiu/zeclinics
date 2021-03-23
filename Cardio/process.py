@@ -8,21 +8,24 @@ import numpy as np
 from os import listdir
 from os.path import isfile, join
 
-#FOR debugging
+# For debugging
 import time
 import matplotlib.pyplot as plt
+
+# For computing beats per minute
+import heartpy as hp
 
 def read(path):
     start=time.time()
 
     path_files = [f for f in listdir(path)]
 
-    #Bad execution handling
+    # Bad execution handling
     if len(path_files)==0:
         print("No files found in the directory")
         return None
 
-    #Check if we have one or many videos to treat
+    # Check if we have one or many videos to treat
     # if there are subfolders --> many
     # if there are files inside --> one
     directory = os.path.isdir(path+'/'+path_files[0])
@@ -85,6 +88,59 @@ def process_dir(input_video_arrays, debug=False):
         processed_videos[i]=process_video(video_arrays[i],debug)
     return processed_videos
 
+def compute_area_size_heart(frames):
+    # Initial level set
+    area_per_frame = []
+    masks = [None]*len(frames)
+    times = [None]*len(frames)
+    num_total_px   = 256*256
+    for i in range(len(frames)):
+        start=time.time()
+        image = frames[i]
+        if i==0:
+            init_ls = checkerboard_level_set(image.shape, 6)
+            iters = 50
+        else:
+            init_ls = inici
+            iters = 5
+        # List with intermediate results for plotting the evolution
+        evolution = []
+        callback = store_evolution_in(evolution)
+        ls = morphological_chan_vese(image, iters, init_level_set=init_ls, smoothing=3,
+                                    iter_callback=callback)
+        
+        if i==0:
+            inici = evolution[49]
+        else:
+            inici = evolution[1]
+        
+        masks[i] = ls
+        reduced = ls[20:235, 20:235]
+        unique, counts = np.unique(reduced, return_counts=True)
+        #dict(zip(unique, counts))
+        area_per_frame.append(min(counts))
+        times[i] = time.time()-start
+    area_per_frame_percentage = [x / num_total_px for x in area_per_frame]
+    return area_per_frame_percentage, min(area_per_frame), max(area_per_frame),masks,times
+
+def compute_measures(frames):
+    freq = compute_area_size(frames)
+    
+
+    array = freq[0]
+
+    fs = 30
+    wd, m = hp.process(array, fs, report_time=True)
+
+    #set large figure
+    plt.figure()
+
+    #call plotter
+    hp.plotter(wd, m)
+
+    #display measures computed
+    for measure in m.keys():
+        print('%s: %f' %(measure, m[measure]))
 
 #########
 #EXECUTION:

@@ -72,6 +72,20 @@ def create_directories(output_root,mask_folders,images_folder):
     for folder in mask_folders:
         if not os.path.exists(output_root + "/" + folder):
             os.system("mkdir " + output_root + "/" + folder)
+'''
+given an image name in the form: plate_name + _ + well_name + _ + type + .jpg,
+return plate_name, well_name
+
+example:
+    image_name = 20190902_1046_CS_R1_Well_left_A01_dor.jpg
+    return: 20190902_1046_CS_R1, Well_left_A01
+'''
+def parse_image_name(image_name):
+    s = image_name.split('Well')
+    #get the first element and remove the "_" at the end
+    plate_name = s[0][:-1]
+    well_name = "Well" + s[1]
+    return plate_name, well_name
 
 '''
 In drive:

@@ -41,7 +41,7 @@ def center_img(img,out_shape,top_left):
     img = img[int(top_left[0]):int(top_left[0]+out_shape),int(top_left[1]):int(top_left[1]+out_shape)]
     return img
 
-def lifpreprocess(path,out_dir='output',index_of_interest=2,out_shape=256,store=False):
+def lifpreprocess(path,out_dir='output',index_of_interest=2,out_shape=256,store=False,debug=False):
     start=time.time()
 
     #Read LIF files in the 'path' directory/file
@@ -60,6 +60,8 @@ def lifpreprocess(path,out_dir='output',index_of_interest=2,out_shape=256,store=
     #   -> Center the image and transform the format
     lif_imgs_frames=[None]*num_imgs
     for i in range(num_imgs):
+        if debug:
+            print("-> preprocessing video ",i+1,"of",num_imgs)
         #Find the first frame and center all frames wrt frame 0
         img_0 = np.uint16(np.array(lif_imgs[i].get_frame(),dtype="object"))
         center = np.unravel_index(np.argmax(img_0, axis=None), img_0.shape)
@@ -67,9 +69,15 @@ def lifpreprocess(path,out_dir='output',index_of_interest=2,out_shape=256,store=
 
         lif_imgs_frames[i] = [center_img(np.uint16(np.array(tv,dtype="object")),out_shape,top_left) for tv in lif_imgs[i].get_iter_t()]
 
+    if(debug):
+        print("PREPROCESS: Elapsed time = ", time.time()-start)
+
     #If we dont want to store
     if(not store):
-        return lif_imgs_frames
+        if directory:
+            return lif_imgs_frames
+        else:
+            return lif_imgs_frames[0]
 
     #Save arrays in disk
     out_dir+='/'
@@ -82,8 +90,6 @@ def lifpreprocess(path,out_dir='output',index_of_interest=2,out_shape=256,store=
         os.mkdir(out_dir+path_files[i].split(".")[0])
         for j in range(len(current_img)):
             save(out_dir+path_files[i].split(".")[0]+"/"+path_files[i].split(".")[0]+"_"+str(j),current_img[j])
-
-    print("Elapsed time = ", time.time()-start)
 
 
 ######

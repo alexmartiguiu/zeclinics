@@ -78,4 +78,5 @@ print(test_evaluation(model,
                 criterion,
                 dataloaders,
                 masks_names = masks_paths,
-                metrics=metrics))
+                metrics=metrics,
+                device = 'cuda'))

@@ -9,7 +9,6 @@ Terato/Model*
 .bashrc
 .cache/
 .gitconfig
-.gitignore
 .ipynb_checkpoints/
 .ipython/
 .jupyter/
@@ -20,3 +19,5 @@ Terato/Model*
 CARDIO_videos/
 __pycache__/
 Cardio/dependencies/
+dependencies/
+*.DS_Store

@@ -6,8 +6,7 @@ from torch.utils import data
 import torch
 
 import datahandler
-from model import createDeepLabv3_mobilenet, createDeepLabv3_resnet_50
-from trainer import train_model
+from evaluate import test_evaluation
 
 '''
 # WARNING:
@@ -54,7 +53,7 @@ images_path = 'Image'
 masks_paths = ['Eyes_dorsal', 'Outline_lateral', 'Yolk_lateral', 'Heart_lateral', 'Outline_dorsal', 'Ov_lateral']
 
 # Path from current path to save the generated model
-exp_directory = './Model_mobilenet_large_BCELoss'
+exp_directory = './Model_resnet50_BCELoss_pruebas'
 exp_directory = Path(exp_directory)
 if not exp_directory.exists():
     exp_directory.mkdir()
@@ -65,14 +64,14 @@ if not exp_directory.exists():
 
 
 
-model = createDeepLabv3_mobilenet()  # Model creation
+model = torch.load('./Model_resnet50_BCELoss/weights.pt',map_location=torch.device('cpu'))
 print(model)
 criterion = torch.nn.BCEWithLogitsLoss(reduction='mean') # Specify the loss function
-optimizer = torch.optim.Adam(model.parameters(), lr=1e-4) # Specify the optimizer
-                                                          # with a low learning rate
 
 # Specify the evaluation metrics
-metrics = {'f1_score': sklearn.metrics.f1_score}
+metrics = {'f1_score': sklearn.metrics.f1_score,
+           'precision': sklearn.metrics.precision_score,
+           'recall': sklearn.metrics.recall_score}
            #'auroc': sklearn.metrics.roc_auc_score}
            #'accuracy_score': sklearn.metrics.accuracy_score}
 # Ceation of the data loaders ['Train', 'Test']
@@ -82,16 +81,9 @@ dataloaders = datahandler.get_dataloader_single_folder(data_path,
                                                        batch_size=2,
                                                        num_workers = 2)
 
-# Train the model
-_ = train_model(model,
+print(test_evaluation(model,
                 criterion,
                 dataloaders,
-                optimizer,
                 bpath=exp_directory,
                 masks_names = masks_paths,
-                metrics=metrics,
-                num_epochs=1)
-
-#######################################################################################
-
-torch.save(model, exp_directory / 'weights.pt')
+                metrics=metrics))

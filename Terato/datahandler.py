@@ -6,8 +6,6 @@ from torchvision import transforms
 
 from segdataset import SegmentationDataset, ClassificationDataset
 
-
-
 def get_dataloader_single_folder(data_dir: str,
                                  image_folder: str,
                                  mask_folders: list,

@@ -1,5 +1,5 @@
 #
-# VERSION 0.2
+# VERSION 1.1
 #
 
 import sys
@@ -103,16 +103,17 @@ def process_video(input_video, base_it=50, update_it=4, skip=1, memory_it=1, deb
                 init_ls = inici
                 iters=update_it
 
+            print(i,"--> doing",iters,"iters")
             callback = store_evolution_in(evolution)
             masks[i] = morphological_chan_vese(video[i], iters, init_level_set=init_ls, smoothing=3, iter_callback=callback)
 
+            if i==0:
+                inici = evolution[base_it-1]
+            else:
+                inici = evolution[memory_it]
+
         else:
             masks[i] = masks[i-1]
-
-        if i==0:
-            inici = evolution[base_it-1]
-        else:
-            inici = evolution[memory_it]
 
         processed_frames[i] = video[i]*(1-masks[i])
 
@@ -145,7 +146,7 @@ def process_dir(input_video_arrays, raw=True, p_out_dir='output', p_index=2, p_o
 # output = processdir('path' -> Directory with subfolders for each video, debug = T or F)
 #########
 #EXAMPLE:
-#p_vid,masks,freq=process_video("20170102_SME_085",debug=True,skip=0)
+#p_vid,masks,freq=process_video("raw_data/20170102_SME_085.lif",debug=True)
 #plt.imshow(p_vid[2270], cmap='gray')
 #plt.show()
 #########

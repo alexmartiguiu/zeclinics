@@ -79,8 +79,8 @@ metrics = {'f1_score': sklearn.metrics.f1_score}
 dataloaders = datahandler.get_dataloader_single_folder(data_path,
                                                        images_path,
                                                        masks_paths,
-                                                       batch_size=8,
-                                                       num_workers = 8)
+                                                       batch_size = 2,
+                                                       num_workers = 2)
 
 # Train the model
 _ = train_model(model,

@@ -47,13 +47,13 @@ def train_model(model, criterion, dataloaders, optimizer, metrics, masks_names, 
             for sample in tqdm(iter(dataloaders[phase])):
                 inputs = sample['image'].to(device)
                 masks = sample['masks'].to(device)
-
                 # zero the parameter gradients
                 optimizer.zero_grad()
 
                 # track history if only in train
                 with torch.set_grad_enabled(phase == 'Train'):
                     outputs = model(inputs)
+
                     #print(outputs['out'].dtype,masks.dtype)
                     #print(outputs['out'].shape,masks.shape)
                     loss = criterion(outputs['out'], masks)
@@ -62,9 +62,11 @@ def train_model(model, criterion, dataloaders, optimizer, metrics, masks_names, 
                     masks_true_by_sample = torch.split(masks, 1, dim = 0)
 
                     for i in range(len(masks_pred_by_sample)):
+                        print("evaluate sample")
                         metrics_sample = evaluate_sample(masks,outputs['out'],masks_names,metrics)
                         for metric_name, metric_value in metrics_sample.items():
                             batchsummary[f'{phase}_{metric_name}'].append(metric_value)
+                        print('finished sample', i)
 
                     # backward + optimize only if in training phase
                     if phase == 'Train':

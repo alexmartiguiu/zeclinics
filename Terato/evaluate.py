@@ -5,20 +5,26 @@ import time
 
 import numpy as np
 import torch
+import time
 from tqdm import tqdm
 
 def evaluate_sample(masks_true, masks_pred, masks_names, metrics):
+    ini = time.time()
     metrics_results = {}
     for i, mask_name in enumerate(masks_names):
-        mask_pred = torch.split(masks_pred, 1, dim = 1)[i].data.numpy().ravel()
-        mask_true = torch.split(masks_true, 1, dim = 1)[i].data.numpy().ravel()
-        if sum(mask_true != 0):
+        if i == 0: print("begin splits",time.time()-ini)
+        mask_pred = torch.split(masks_pred, 1, dim = 1)[i].cpu().data.numpy().ravel()
+        mask_true = torch.split(masks_true, 1, dim = 1)[i].cpu().data.numpy().ravel()
+        if i == 0: print("end splits", time.time()-ini)
+        if sum(mask_true) != 0:
+            if i == 0: print("sum finished", time.time()-ini)
             for name, metric in metrics.items():
-                if name == 'f1_score':
+                if name in ['f1_score','precision','recall']:
                     # Use a classification threshold of 0.1
-                    metrics_results[f'{name}_{mask_name}'] = metric(mask_true > 0, mask_pred > 0.1, zero_division = 1)
+                    metrics_results[f'{name}_{mask_name}'] = metric(mask_true > 0, mask_pred > 0.1)
                 else:
                     metrics_results[f'{name}_{mask_name}'] = metric(mask_true.astype('uint8'), mask_pred)
+        if i == 0: print("end iteration",time.time()-ini)
     return metrics_results
 
 

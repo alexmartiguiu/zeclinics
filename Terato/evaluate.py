@@ -10,8 +10,8 @@ from tqdm import tqdm
 def evaluate_sample(masks_true, masks_pred, masks_names, metrics):
     metrics_results = {}
     for i, mask_name in enumerate(masks_names):
-        mask_pred = torch.split(masks_pred, 1, dim = 1)[i].data.cpu().numpy().ravel()
-        mask_true = torch.split(masks_true, 1, dim = 1)[i].data.cpu().numpy().ravel()
+        mask_pred = torch.split(masks_pred, 1, dim = 1)[i].data.numpy().ravel()
+        mask_true = torch.split(masks_true, 1, dim = 1)[i].data.numpy().ravel()
         if sum(mask_true != 0):
             for name, metric in metrics.items():
                 if name == 'f1_score':
@@ -37,11 +37,7 @@ def test_evaluation(model, criterion, dataloaders, metrics, masks_names, bpath, 
 
     metrics_global = {f'{m}_{mask_name}':[] for m in metrics.keys() for mask_name in masks_names}
     metrics_global['Loss'] = []
-    cont = 0
     for batch in tqdm(iter(dataloaders['Test'])):
-        if cont == 4:
-            break
-        cont += 1
         for input,masks in zip(torch.split(batch['image'], 1, dim = 0), torch.split(batch['masks'],1,dim = 0)):
             print(masks.shape)
             input = input.to(device)

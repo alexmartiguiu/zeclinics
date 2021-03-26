@@ -1,7 +1,6 @@
 # zeclinics
 
 ### Requeriments
-
 ```
-pip install -r requeriments.txt
+pip install -r Cardio/requeriments.txt
 ```

@@ -20,7 +20,6 @@ def train_model(model, criterion, dataloaders, optimizer, metrics, masks_names, 
 
     # Initialize the log file for training and testing loss and metrics
     fieldnames = ['epoch', 'Train_loss', 'Test_loss'] + \
-        [f'Train_{m}_{mask_name}' for m in metrics.keys() for mask_name in masks_names] + \
         [f'Test_{m}_{mask_name}' for m in metrics.keys() for mask_name in masks_names] + \
         [f'Train_{m}' for m in metrics.keys()] + \
         [f'Test_{m}' for m in metrics.keys()]
@@ -35,7 +34,7 @@ def train_model(model, criterion, dataloaders, optimizer, metrics, masks_names, 
         print('-' * 10)
         # Each epoch has a training and validation phase
         # Initialize batch summary -> Contains information about metrics
-        batchsummary = {a: [0] for a in fieldnames}
+        batchsummary = {a: [] for a in fieldnames}
 
         for phase in ['Train', 'Test']:
             if phase == 'Train':
@@ -58,18 +57,17 @@ def train_model(model, criterion, dataloaders, optimizer, metrics, masks_names, 
                     #print(outputs['out'].shape,masks.shape)
                     loss = criterion(outputs['out'], masks)
 
-                    masks_pred_by_sample = torch.split(outputs['out'], 1, dim = 0)
-                    masks_true_by_sample = torch.split(masks, 1, dim = 0)
+                    if phase == 'Test':
+                        masks_pred_by_sample = torch.split(outputs['out'], 1, dim = 0)
+                        masks_true_by_sample = torch.split(masks, 1, dim = 0)
 
-                    for i in range(len(masks_pred_by_sample)):
-                        print("evaluate sample")
-                        metrics_sample = evaluate_sample(masks,outputs['out'],masks_names,metrics)
-                        for metric_name, metric_value in metrics_sample.items():
-                            batchsummary[f'{phase}_{metric_name}'].append(metric_value)
-                        print('finished sample', i)
-
-                    # backward + optimize only if in training phase
-                    if phase == 'Train':
+                        for i in range(len(masks_pred_by_sample)):
+                            #print("evaluate sample")
+                            metrics_sample = evaluate_sample(masks,outputs['out'],masks_names,metrics)
+                            for metric_name, metric_value in metrics_sample.items():
+                                batchsummary[f'{phase}_{metric_name}'].append(metric_value)
+                            #print('finished sample', i)
+                    else:
                         loss.backward()
                         optimizer.step()
 

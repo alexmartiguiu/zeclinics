@@ -52,13 +52,6 @@ data_path = '../Data'
 images_path = 'Image'
 masks_paths = ['Eyes_dorsal', 'Outline_lateral', 'Yolk_lateral', 'Heart_lateral', 'Outline_dorsal', 'Ov_lateral']
 
-# Path from current path to save the generated model
-exp_directory = './Model_resnet50_BCELoss_pruebas'
-exp_directory = Path(exp_directory)
-if not exp_directory.exists():
-    exp_directory.mkdir()
-
-
 
 ################################### Model creation ###################################
 

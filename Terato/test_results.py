@@ -77,6 +77,5 @@ dataloaders = datahandler.get_dataloader_single_folder(data_path,
 print(test_evaluation(model,
                 criterion,
                 dataloaders,
-                bpath=exp_directory,
                 masks_names = masks_paths,
                 metrics=metrics))

@@ -30,7 +30,7 @@ def evaluate_sample(masks_true, masks_pred, masks_names, metrics):
     return metrics_results
 
 
-def test_evaluation(model, criterion, dataloaders, metrics, masks_names, bpath, device='cpu'):
+def test_evaluation(model, criterion, dataloaders, metrics, masks_names, device='cpu'):
     since = time.time()
 
     if device != 'cpu':
